@@ -4,7 +4,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from datetime import datetime
+from datetime import datetime, timedelta
+from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
 
@@ -95,10 +96,41 @@ def load_csv_to_bronze():
     finally:
         conn.close()
 
+def check_quarantine_and_notify():
+    hook = PostgresHook(postgres_conn_id="postgres_default")
+    conn = hook.get_conn()
+
+    try:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM silver.customer_transactions_quarantine;")
+            rows = cursor.fetchall()
+            col_names = [desc[0] for desc in cursor.description]
+
+            if not rows:
+                logger.info("Quarantine table is empty — no email will be sent")
+                return
+
+            logger.info(f"Found {len(rows)} quarantine record(s)")
+            logger.info("First 5 quarantine rows:\n" + tabulate(rows[:5], headers=col_names, tablefmt="simple"))
+
+        finally:
+            cursor.close()
+    finally:
+        conn.close()
+
+
+DEFAULT_ARGS = {
+    "retries": 3,
+    "retry_delay": timedelta(minutes=2),
+    "retry_exponential_backoff": True,
+    "max_retry_delay": timedelta(minutes=10),
+}
 
 with DAG(
     dag_id=DAG_ID,
-    start_date=datetime(2024, 1, 1),
+    default_args=DEFAULT_ARGS,
+    start_date=datetime(2026, 5, 25),
     schedule=None,
     catchup=False,
     tags=["case-study"],
@@ -111,5 +143,9 @@ with DAG(
         task_id="dbt_build",
         bash_command=f"cd {DBT_DIR} && dbt build --profiles-dir {DBT_DIR}",
     )
+    notify_quarantine = PythonOperator(
+        task_id="check_quarantine_and_notify",
+        python_callable=check_quarantine_and_notify,
+    )
 
-    load_csv >> dbt_build
+    load_csv >> dbt_build >> notify_quarantine

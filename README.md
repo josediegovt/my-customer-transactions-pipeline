@@ -24,6 +24,19 @@ Data cleaning decisions per column:
     Leveraged PostgreSQL's paradigm of outputting different date formats into the YYYY-MM-DD format. Check if it is a valid date, if not then quarantined.
 - product_name:
     although "Product" seems to be unnecessary and only memory consuming, we can keep it as we are normalizing the customer_transactions table by creating a dedicated product dimensions table. In there, I decide to take the latest name of a product, in case we see a duplicate product_id with different product_names.
+---
+TESTS
+
+I decided to keep the test_silver_count_equals_bronze.sql file in order to discuss what I intended to do with it even though its behaviour is not what I expected.
+
+My intention was to have this test keep the gold layer from materializing if it failed, but it is not working like that.
+
+In reality, maybe the DAG file would have to decouple the dbt build to specific dbt run/test calls. I decided not to implement this for the sake of clarity.
+
+---
+NOTIFICATION
+
+For the sake of clarity, I did not fully write the email template and logic that would send the email. That is beyond necessary I believe. However, I did make the check and notification as part of the DAG.
 
 ---
 USEFUL docker COMMANDS
