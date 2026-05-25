@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: customer_transactions
+        description: "Bronze customer transactions loaded from CSV by Airflow"
+        columns:
+          - name: transaction_id
+            description: "Unique transaction identifier"
+          - name: customer_id
+            description: "Customer identifier"
+          - name: transaction_date
+            description: "Date of transaction"
+          - name: product_id
+            description: "Product identifier"
+          - name: product_name
+            description: "Product name"
+          - name: quantity
+            description: "Quantity purchased"
+          - name: price
+            description: "Unit price"
+          - name: tax
+            description: "Tax amount"

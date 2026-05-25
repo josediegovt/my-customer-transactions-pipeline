@@ -1,0 +1,84 @@
+version: 2
+
+models:
+  - name: fct_customer_transactions
+    constraints:
+      - type: primary_key
+        columns: [transaction_id]
+    columns:
+      - name: transaction_id
+        constraints:
+          - type: not_null
+          - type: unique
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        tests:
+          - not_null:
+              severity: warn
+
+      - name: transaction_date
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+
+      - name: product_id
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+
+      - name: quantity
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: price
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: tax
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: total_amount
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "= round((price * quantity) + tax, 2)"
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+  - name: dim_product
+    constraints:
+      - type: primary_key
+        columns: [product_id]
+    columns:
+      - name: product_id
+        constraints:
+          - type: not_null
+          - type: unique
+        tests:
+          - unique
+          - not_null
+
+      - name: product_name
+        tests:
+          - not_null:
+              severity: warn

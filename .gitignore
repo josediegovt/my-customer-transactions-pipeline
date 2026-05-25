@@ -1,0 +1,25 @@
+# dbt
+dbt/logs/
+dbt/target/
+dbt/dbt_packages/
+dbt/package-lock.yml
+
+# Ignore all runtime logs
+logs/
+
+# Ignore raw data files
+data/
+
+# Ignore local dbt user profiles and credentials
+dbt/.user.yml
+dbt/profiles.yml
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# macOS
+.DS_Store

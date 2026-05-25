@@ -1,0 +1,27 @@
+name: 'customer_case_study'
+version: '1.0.0'
+config-version: 2
+
+profile: 'customer_case_study'
+
+on-run-start:
+  - "{{ create_safe_to_date() }}"
+
+model-paths: ["models"]
+
+models:
+  customer_case_study:
+    staging:
+      +materialized: ephemeral
+
+    silver:
+      +materialized: table
+      +schema: silver
+
+    gold:
+      +materialized: table
+      +schema: gold
+
+    reports:
+      +materialized: table
+      +schema: reports
