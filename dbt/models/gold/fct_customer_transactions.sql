@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key='transaction_id',
+    incremental_strategy='merge'
+) }}
+
 WITH silver AS (
     SELECT * FROM {{ ref('customer_transactions') }}
 )

@@ -2,11 +2,19 @@ version: 2
 
 models:
   - name: fct_customer_transactions
+    config:
+      contract:
+        enforced: true
+      materialized: incremental
+      unique_key: transaction_id
+      incremental_strategy: merge
+      on_schema_change: fail
     constraints:
       - type: primary_key
         columns: [transaction_id]
     columns:
       - name: transaction_id
+        data_type: integer
         constraints:
           - type: not_null
           - type: unique
@@ -15,23 +23,27 @@ models:
           - not_null
 
       - name: customer_id
+        data_type: integer
         tests:
           - not_null:
               severity: warn
 
       - name: transaction_date
+        data_type: date
         constraints:
           - type: not_null
         tests:
           - not_null
 
       - name: product_id
+        data_type: integer
         constraints:
           - type: not_null
         tests:
           - not_null
 
       - name: quantity
+        data_type: integer
         constraints:
           - type: not_null
         tests:
@@ -40,6 +52,7 @@ models:
               expression: "> 0"
 
       - name: price
+        data_type: numeric
         constraints:
           - type: not_null
         tests:
@@ -48,6 +61,7 @@ models:
               expression: "> 0"
 
       - name: tax
+        data_type: numeric
         constraints:
           - type: not_null
         tests:
@@ -56,6 +70,7 @@ models:
               expression: "> 0"
 
       - name: total_amount
+        data_type: numeric
         constraints:
           - type: not_null
         tests:
@@ -66,11 +81,19 @@ models:
               expression: "> 0"
 
   - name: dim_product
+    config:
+      contract:
+        enforced: true
+      materialized: incremental
+      unique_key: product_id
+      incremental_strategy: merge
+      on_schema_change: fail
     constraints:
       - type: primary_key
         columns: [product_id]
     columns:
       - name: product_id
+        data_type: integer
         constraints:
           - type: not_null
           - type: unique
@@ -79,6 +102,7 @@ models:
           - not_null
 
       - name: product_name
+        data_type: varchar
         tests:
           - not_null:
               severity: warn

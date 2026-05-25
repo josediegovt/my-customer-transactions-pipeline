@@ -1,4 +1,3 @@
-
 WITH stg AS (
     SELECT * FROM {{ ref('stg_customer_transactions') }}
 )

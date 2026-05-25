@@ -2,11 +2,18 @@ version: 2
 
 models:
   - name: customer_transactions
+    config:
+      contract:
+        enforced: true
+      materialized: table
+    tests:
+      - silver_count_equals_bronze
     constraints:
       - type: primary_key
         columns: [transaction_id]
     columns:
       - name: transaction_id
+        data_type: integer
         constraints:
           - type: not_null
           - type: unique
@@ -15,23 +22,34 @@ models:
           - not_null
 
       - name: customer_id
+        data_type: integer
         tests:
           - not_null:
               severity: warn
 
       - name: transaction_date
+        data_type: date
         constraints:
           - type: not_null
         tests:
           - not_null
 
       - name: product_id
+        data_type: integer
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+
+      - name: product_name
+        data_type: varchar
         constraints:
           - type: not_null
         tests:
           - not_null
 
       - name: quantity
+        data_type: integer
         constraints:
           - type: not_null
         tests:
@@ -40,6 +58,7 @@ models:
               expression: "> 0"
 
       - name: price
+        data_type: numeric
         constraints:
           - type: not_null
         tests:
@@ -48,9 +67,45 @@ models:
               expression: "> 0"
 
       - name: tax
+        data_type: numeric
         constraints:
           - type: not_null
         tests:
           - not_null
           - dbt_utils.expression_is_true:
               expression: "> 0"
+
+  - name: customer_transactions_quarantine
+    config:
+      materialized: table
+    columns:
+      - name: transaction_id
+        data_type: text
+
+      - name: customer_id
+        data_type: text
+
+      - name: transaction_date
+        data_type: text
+
+      - name: product_id
+        data_type: text
+
+      - name: product_name
+        data_type: text
+
+      - name: quantity
+        data_type: text
+
+      - name: price
+        data_type: text
+
+      - name: tax
+        data_type: text
+
+      - name: failure_reasons
+        data_type: text[]
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "!= '{}'"

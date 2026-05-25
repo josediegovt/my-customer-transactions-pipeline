@@ -31,9 +31,8 @@ def load_csv_to_bronze():
         raise ValueError(f"CSV file at {CSV_PATH} is empty (0 bytes)")
 
     with open(CSV_PATH, "r") as f:
-        lines = f.readlines()
-
-    line_count = len(lines)
+        header = f.readline()
+        line_count = sum(1 for _ in f)
 
     if line_count <= 1:
         raise ValueError(
@@ -41,7 +40,7 @@ def load_csv_to_bronze():
         )
 
     # Validate header columns
-    actual_headers = set(lines[0].strip().lower().split(","))
+    actual_headers = set(header.strip().lower().split(","))
 
     missing = EXPECTED_HEADERS - actual_headers
     extra = actual_headers - EXPECTED_HEADERS
@@ -82,8 +81,7 @@ def load_csv_to_bronze():
 
             conn.commit()
             logger.info(
-                "Successfully loaded %d data rows into bronze.customer_transactions",
-                line_count - 1,
+                f"Successfully loaded {line_count - 1} data rows into bronze.customer_transactions"
             )
 
         except Exception:
