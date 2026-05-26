@@ -41,8 +41,10 @@ For the sake of clarity, I did not fully write the email template and logic that
 ---
 USEFUL docker COMMANDS
 
-First time docker commands:
-docker compose up --build airflow-init && docker compose up -d
+To start project:
+1) Remove .example from profile.yml.example
+2) Remove .example from .env.example
+3) Run docker compose up --build airflow-init && docker compose up -d
 
 Check that everything is correct:
 docker compose ps

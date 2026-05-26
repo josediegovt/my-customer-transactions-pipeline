@@ -1,0 +1,12 @@
+customer_case_study:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      port: 5432
+      user: airflow
+      password: airflow
+      dbname: airflow
+      schema: public
+      threads: 1
